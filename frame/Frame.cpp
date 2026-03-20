@@ -1125,7 +1125,7 @@ void Frame::softwareRasterize()
             if (w0 >= 0 && w1 >= 0 && w2 >= 0) {
               float depth = w0 * scr0.z + w1 * scr1.z + w2 * scr2.z;
               uint32_t idx = py * m_size.x + px;
-              if (depth > m_depthBuffer[idx]) {
+              if (depth < m_depthBuffer[idx]) {
                 m_depthBuffer[idx] = depth;
                 float4 color = c0 * w0 + c1 * w1 + c2 * w2;
                 color.x *= lighting;
