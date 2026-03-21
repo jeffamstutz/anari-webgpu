@@ -11,10 +11,10 @@ WebGPUDeviceGlobalState::WebGPUDeviceGlobalState(ANARIDevice d)
 
 WebGPUDeviceGlobalState::~WebGPUDeviceGlobalState()
 {
-  wgpuQueueRelease(wgpuQueue);
-  wgpuDeviceRelease(wgpuDevice);
-  wgpuAdapterRelease(wgpuAdapter);
-  wgpuInstanceRelease(wgpuInstance);
+  if (wgpuQueue) { wgpuQueueRelease(wgpuQueue); wgpuQueue = nullptr; }
+  if (wgpuDevice) { wgpuDeviceRelease(wgpuDevice); wgpuDevice = nullptr; }
+  if (wgpuAdapter) { wgpuAdapterRelease(wgpuAdapter); wgpuAdapter = nullptr; }
+  if (wgpuInstance) { wgpuInstanceRelease(wgpuInstance); wgpuInstance = nullptr; }
 }
 
 } // namespace anari_webgpu
