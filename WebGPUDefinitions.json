@@ -106,6 +106,46 @@
       ]
     },
     {
+      "type": "ANARI_GEOMETRY",
+      "name": "triangle",
+      "parameters": [
+        {
+          "name": "vertex.position",
+          "types": [
+            "ANARI_ARRAY1D"
+          ],
+          "tags": [
+            "required"
+          ],
+          "description": "vertex positions (vec3f)"
+        },
+        {
+          "name": "vertex.normal",
+          "types": [
+            "ANARI_ARRAY1D"
+          ],
+          "tags": [],
+          "description": "vertex normals (vec3f)"
+        },
+        {
+          "name": "vertex.color",
+          "types": [
+            "ANARI_ARRAY1D"
+          ],
+          "tags": [],
+          "description": "vertex colors (vec4f)"
+        },
+        {
+          "name": "primitive.index",
+          "types": [
+            "ANARI_ARRAY1D"
+          ],
+          "tags": [],
+          "description": "triangle index buffer (uvec3)"
+        }
+      ]
+    },
+    {
       "type": "ANARI_MATERIAL",
       "name": "matte",
       "parameters": [
