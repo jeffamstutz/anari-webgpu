@@ -54,6 +54,7 @@ struct WebGPUDevice : public helium::BaseDevice
 
  private:
   WebGPUDeviceGlobalState *deviceState() const;
+  void initWebGPU();
   bool m_initialized{false};
 };
 
