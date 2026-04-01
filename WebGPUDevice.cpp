@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "WebGPUDevice.h"
+
+#include <webgpu/webgpu.h>
 #include "array/Array1D.h"
 #include "array/Array2D.h"
 #include "array/Array3D.h"
@@ -118,8 +120,68 @@ WebGPUDevice::~WebGPUDevice() {
 void WebGPUDevice::initDevice() {
   if (m_initialized) return;
   reportMessage(ANARI_SEVERITY_DEBUG, "initializing WebGPU device (%p)", this);
+  initWebGPU();
   m_initialized = true;
 }
+void WebGPUDevice::initWebGPU() {
+  auto *state = deviceState();
+
+  WGPUInstanceDescriptor instanceDesc{};
+  instanceDesc.nextInChain = nullptr;
+  state->wgpuInstance = wgpuCreateInstance(&instanceDesc);
+
+  if (!state->wgpuInstance) {
+    reportMessage(ANARI_SEVERITY_WARNING,
+        "Failed to create WebGPU instance. Falling back to software rasterization.");
+    return;
+  }
+
+  WGPURequestAdapterOptions adapterOpts{};
+  adapterOpts.nextInChain = nullptr;
+  adapterOpts.powerPreference = WGPUPowerPreference_HighPerformance;
+
+  struct AdapterCtx { WGPUAdapter adapter{nullptr}; bool done{false}; };
+  AdapterCtx adapterCtx;
+
+  wgpuInstanceRequestAdapter(state->wgpuInstance, &adapterOpts,
+      [](WGPURequestAdapterStatus status, WGPUAdapter adapter, const char *msg, void *ud) {
+        auto *ctx = (AdapterCtx *)ud;
+        if (status == WGPURequestAdapterStatus_Success) ctx->adapter = adapter;
+        ctx->done = true;
+      }, &adapterCtx);
+
+  while (!adapterCtx.done) wgpuInstanceProcessEvents(state->wgpuInstance);
+
+  if (!adapterCtx.adapter) {
+    reportMessage(ANARI_SEVERITY_WARNING, "Failed to get WebGPU adapter.");
+    return;
+  }
+  state->wgpuAdapter = adapterCtx.adapter;
+
+  WGPUDeviceDescriptor deviceDesc{};
+  deviceDesc.nextInChain = nullptr;
+
+  struct DeviceCtx { WGPUDevice device{nullptr}; bool done{false}; };
+  DeviceCtx deviceCtx;
+
+  wgpuAdapterRequestDevice(state->wgpuAdapter, &deviceDesc,
+      [](WGPURequestDeviceStatus status, WGPUDevice device, const char *msg, void *ud) {
+        auto *ctx = (DeviceCtx *)ud;
+        if (status == WGPURequestDeviceStatus_Success) ctx->device = device;
+        ctx->done = true;
+      }, &deviceCtx);
+
+  while (!deviceCtx.done) wgpuInstanceProcessEvents(state->wgpuInstance);
+
+  if (!deviceCtx.device) {
+    reportMessage(ANARI_SEVERITY_WARNING, "Failed to get WebGPU device.");
+    return;
+  }
+  state->wgpuDevice = deviceCtx.device;
+  state->wgpuQueue = wgpuDeviceGetQueue(state->wgpuDevice);
+  reportMessage(ANARI_SEVERITY_DEBUG, "WebGPU device initialized successfully");
+}
+
 
 void WebGPUDevice::deviceCommitParameters() {
   helium::BaseDevice::deviceCommitParameters();
