@@ -3,22 +3,38 @@
 
 #pragma once
 
+// helium
 #include "helium/BaseDevice.h"
+
 #include "Object.h"
 
 namespace anari_webgpu {
 
 struct WebGPUDevice : public helium::BaseDevice
 {
+  /////////////////////////////////////////////////////////////////////////////
+  // Main interface to accepting API calls
+  /////////////////////////////////////////////////////////////////////////////
+
+  // API Objects //////////////////////////////////////////////////////////////
+
   ANARIArray1D newArray1D(const void *appMemory,
-      ANARIMemoryDeleter deleter, const void *userdata,
-      ANARIDataType, uint64_t numItems1) override;
+      ANARIMemoryDeleter deleter,
+      const void *userdata,
+      ANARIDataType,
+      uint64_t numItems1) override;
   ANARIArray2D newArray2D(const void *appMemory,
-      ANARIMemoryDeleter deleter, const void *userdata,
-      ANARIDataType, uint64_t numItems1, uint64_t numItems2) override;
+      ANARIMemoryDeleter deleter,
+      const void *userdata,
+      ANARIDataType,
+      uint64_t numItems1,
+      uint64_t numItems2) override;
   ANARIArray3D newArray3D(const void *appMemory,
-      ANARIMemoryDeleter deleter, const void *userdata,
-      ANARIDataType, uint64_t numItems1, uint64_t numItems2,
+      ANARIMemoryDeleter deleter,
+      const void *userdata,
+      ANARIDataType,
+      uint64_t numItems1,
+      uint64_t numItems2,
       uint64_t numItems3) override;
   ANARICamera newCamera(const char *type) override;
   ANARIFrame newFrame() override;
@@ -34,28 +50,51 @@ struct WebGPUDevice : public helium::BaseDevice
   ANARIVolume newVolume(const char *type) override;
   ANARIWorld newWorld() override;
 
+  // Query functions //////////////////////////////////////////////////////////
+
   const char **getObjectSubtypes(ANARIDataType objectType) override;
   const void *getObjectInfo(ANARIDataType objectType,
-      const char *objectSubtype, const char *infoName,
+      const char *objectSubtype,
+      const char *infoName,
       ANARIDataType infoType) override;
   const void *getParameterInfo(ANARIDataType objectType,
-      const char *objectSubtype, const char *parameterName,
-      ANARIDataType parameterType, const char *infoName,
+      const char *objectSubtype,
+      const char *parameterName,
+      ANARIDataType parameterType,
+      const char *infoName,
       ANARIDataType infoType) override;
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Helper/other functions and data members
+  /////////////////////////////////////////////////////////////////////////////
 
   WebGPUDevice(ANARIStatusCallback defaultCallback, const void *userPtr);
   WebGPUDevice(ANARILibrary);
   ~WebGPUDevice() override;
 
   void initDevice();
+
   void deviceCommitParameters() override;
-  int deviceGetProperty(const char *name, ANARIDataType type,
-      void *mem, uint64_t size, uint32_t mask) override;
+  int deviceGetProperty(const char *name,
+      ANARIDataType type,
+      void *mem,
+      uint64_t size,
+      uint32_t mask) override;
 
  private:
   WebGPUDeviceGlobalState *deviceState() const;
+
   void initWebGPU();
+  void cleanupWebGPU();
+
   bool m_initialized{false};
+
+  // External WebGPU handles provided via device parameters.
+  // When set, these take priority over internal handle creation.
+  WGPUInstance m_externalInstance{nullptr};
+  WGPUAdapter m_externalAdapter{nullptr};
+  WGPUDevice m_externalDevice{nullptr};
+  WGPUQueue m_externalQueue{nullptr};
 };
 
 } // namespace anari_webgpu
