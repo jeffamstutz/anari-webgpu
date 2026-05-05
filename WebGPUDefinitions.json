@@ -11,7 +11,36 @@
   "objects": [
     {
       "type": "ANARI_DEVICE",
-      "parameters": []
+      "parameters": [
+        {
+          "name": "webgpu.instance",
+          "types": ["ANARI_VOID_POINTER"],
+          "tags": [],
+          "default": null,
+          "description": "External WGPUInstance handle for resource sharing. When set, the device uses this instance instead of creating its own."
+        },
+        {
+          "name": "webgpu.adapter",
+          "types": ["ANARI_VOID_POINTER"],
+          "tags": [],
+          "default": null,
+          "description": "External WGPUAdapter handle for resource sharing."
+        },
+        {
+          "name": "webgpu.device",
+          "types": ["ANARI_VOID_POINTER"],
+          "tags": [],
+          "default": null,
+          "description": "External WGPUDevice handle. When set, GPU resources (buffers, textures) are directly shareable with the external WebGPU consumer."
+        },
+        {
+          "name": "webgpu.queue",
+          "types": ["ANARI_VOID_POINTER"],
+          "tags": [],
+          "default": null,
+          "description": "External WGPUQueue handle. If not set, the default queue is obtained from the WGPUDevice."
+        }
+      ]
     },
     {
       "type": "ANARI_RENDERER",
@@ -48,57 +77,35 @@
       "parameters": [
         {
           "name": "position",
-          "types": [
-            "ANARI_FLOAT32_VEC3"
-          ],
+          "types": ["ANARI_FLOAT32_VEC3"],
           "tags": [],
-          "default": [
-            0.0,
-            0.0,
-            0.0
-          ],
+          "default": [0.0, 0.0, 0.0],
           "description": "camera position"
         },
         {
           "name": "direction",
-          "types": [
-            "ANARI_FLOAT32_VEC3"
-          ],
+          "types": ["ANARI_FLOAT32_VEC3"],
           "tags": [],
-          "default": [
-            0.0,
-            0.0,
-            -1.0
-          ],
+          "default": [0.0, 0.0, -1.0],
           "description": "camera look direction"
         },
         {
           "name": "up",
-          "types": [
-            "ANARI_FLOAT32_VEC3"
-          ],
+          "types": ["ANARI_FLOAT32_VEC3"],
           "tags": [],
-          "default": [
-            0.0,
-            1.0,
-            0.0
-          ],
+          "default": [0.0, 1.0, 0.0],
           "description": "camera up vector"
         },
         {
           "name": "fovy",
-          "types": [
-            "ANARI_FLOAT32"
-          ],
+          "types": ["ANARI_FLOAT32"],
           "tags": [],
           "default": 1.0471975511965976,
           "description": "field of view in y (radians)"
         },
         {
           "name": "aspect",
-          "types": [
-            "ANARI_FLOAT32"
-          ],
+          "types": ["ANARI_FLOAT32"],
           "tags": [],
           "default": 1.0,
           "description": "aspect ratio"
@@ -111,35 +118,25 @@
       "parameters": [
         {
           "name": "vertex.position",
-          "types": [
-            "ANARI_ARRAY1D"
-          ],
-          "tags": [
-            "required"
-          ],
+          "types": ["ANARI_ARRAY1D"],
+          "tags": ["required"],
           "description": "vertex positions (vec3f)"
         },
         {
           "name": "vertex.normal",
-          "types": [
-            "ANARI_ARRAY1D"
-          ],
+          "types": ["ANARI_ARRAY1D"],
           "tags": [],
           "description": "vertex normals (vec3f)"
         },
         {
           "name": "vertex.color",
-          "types": [
-            "ANARI_ARRAY1D"
-          ],
+          "types": ["ANARI_ARRAY1D"],
           "tags": [],
           "description": "vertex colors (vec4f)"
         },
         {
           "name": "primitive.index",
-          "types": [
-            "ANARI_ARRAY1D"
-          ],
+          "types": ["ANARI_ARRAY1D"],
           "tags": [],
           "description": "triangle index buffer (uvec3)"
         }
@@ -151,16 +148,9 @@
       "parameters": [
         {
           "name": "color",
-          "types": [
-            "ANARI_FLOAT32_VEC4"
-          ],
+          "types": ["ANARI_FLOAT32_VEC4"],
           "tags": [],
-          "default": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ],
+          "default": [0.8, 0.8, 0.8, 1.0],
           "description": "diffuse color"
         }
       ]
@@ -171,35 +161,21 @@
       "parameters": [
         {
           "name": "direction",
-          "types": [
-            "ANARI_FLOAT32_VEC3"
-          ],
+          "types": ["ANARI_FLOAT32_VEC3"],
           "tags": [],
-          "default": [
-            0.0,
-            0.0,
-            -1.0
-          ],
+          "default": [0.0, 0.0, -1.0],
           "description": "light direction"
         },
         {
           "name": "color",
-          "types": [
-            "ANARI_FLOAT32_VEC3"
-          ],
+          "types": ["ANARI_FLOAT32_VEC3"],
           "tags": [],
-          "default": [
-            1.0,
-            1.0,
-            1.0
-          ],
+          "default": [1.0, 1.0, 1.0],
           "description": "light color"
         },
         {
           "name": "irradiance",
-          "types": [
-            "ANARI_FLOAT32"
-          ],
+          "types": ["ANARI_FLOAT32"],
           "tags": [],
           "default": 1.0,
           "description": "light irradiance"
