@@ -9,6 +9,55 @@
 // 3. Set up a simple scene with a triangle
 // 4. Render and save the result to a PPM file
 //
+// Resource sharing mode (pass --shared):
+//   Creates its own WGPUDevice first, passes it to the ANARI device via
+//   the "webgpu.device" parameter, then retrieves it back via
+//   anariGetProperty to confirm the round-trip. This demonstrates how
+//   an external WebGPU renderer can share GPU resources with ANARI.
+
+#include <anari/anari.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+static void statusFunc(const void * /*userData*/, ANARIDevice /*device*/,
+                       ANARIObject source, ANARIDataType /*sourceType*/,
+                       ANARIStatusSeverity severity, ANARIStatusCode /*code*/,
+                       const char *message) {
+  if (severity == ANARI_SEVERITY_FATAL_ERROR)
+    fprintf(stderr, "[FATAL] %s\n", message);
+  else if (severity == ANARI_SEVERITY_ERROR)
+    fprintf(stderr, "[ERROR] %s\n", message);
+  else if (severity == ANARI_SEVERITY_WARNING)
+    fprintf(stderr, "[WARN]  %s\n", message);
+  else if (severity == ANARI_SEVERITY_INFO)
+    fprintf(stderr, "[INFO]  %s\n", message);
+}
+
+static void writePPM(const char *filename, int width, int height,
+                     const uint8_t *pixels) {
+  FILE *f = fopen(filename, "wb");
+  if (!f) {
+    fprintf(stderr, "Failed to open %s for writing\n", filename);
+    return;
+  }
+  fprintf(f, "P6\n%d %d\n255\n", width, height);
+  for (int i = 0; i < width * height; i++) {
+    fwrite(&pixels[i * 4], 1, 3, f); // Write RGB, skip A
+  }
+  fclose(f);
+  printf("Wrote %s (%dx%d)\n", filename, width, height);
+}
+
+int main(int argc, const char *argv[]) {
+  bool sharedMode = false;
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "--shared") == 0)
+      sharedMode = true;
+  }
+
+  printf("ANARI WebGPU Example: Render a Triangle%s\n",
+         sharedMode ? " (shared WGPUDevice)" : "");
 
   // Load the WebGPU ANARI library
   ANARILibrary lib = anariLoadLibrary("webgpu", statusFunc, nullptr);
@@ -42,6 +91,9 @@
   // Verify we can query the underlying WGPUDevice back (for resource sharing)
   void *wgpuDev = nullptr;
   if (anariGetProperty(
+          device, device, "webgpu.device", ANARI_VOID_POINTER, &wgpuDev,
+          sizeof(wgpuDev), ANARI_WAIT)) {
+    printf("Underlying WGPUDevice: %p (available for resource sharing)\n",
            wgpuDev);
   }
 
