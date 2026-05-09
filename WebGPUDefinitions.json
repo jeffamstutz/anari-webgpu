@@ -16,28 +16,24 @@
           "name": "webgpu.instance",
           "types": ["ANARI_VOID_POINTER"],
           "tags": [],
-          "default": null,
           "description": "External WGPUInstance handle for resource sharing. When set, the device uses this instance instead of creating its own."
         },
         {
           "name": "webgpu.adapter",
           "types": ["ANARI_VOID_POINTER"],
           "tags": [],
-          "default": null,
           "description": "External WGPUAdapter handle for resource sharing."
         },
         {
           "name": "webgpu.device",
           "types": ["ANARI_VOID_POINTER"],
           "tags": [],
-          "default": null,
           "description": "External WGPUDevice handle. When set, GPU resources (buffers, textures) are directly shareable with the external WebGPU consumer."
         },
         {
           "name": "webgpu.queue",
           "types": ["ANARI_VOID_POINTER"],
           "tags": [],
-          "default": null,
           "description": "External WGPUQueue handle. If not set, the default queue is obtained from the WGPUDevice."
         }
       ]
